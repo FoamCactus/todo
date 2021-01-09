@@ -1,0 +1,23 @@
+[package]
+name = "todo"
+version = "0.1.0"
+authors = ["Caleb Hill <foamcactus@protonmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+diesel = { version = "1.4.4", features = ["sqlite","r2d2"] }
+serde = {version= "^1.0",features=["derive"]}
+serde_json = { version = "1.0"}
+dotenv = "0.15.0"
+actix-web = "2.0"
+actix-rt = "1.0"
+actix-files = "0.2.1"
+actix-session = "0.3"
+actix = "0.10.0-alpha.3"
+log = "0.4"
+pretty_env_logger = "0.4"
+models = {path="src/models"}
+
+
