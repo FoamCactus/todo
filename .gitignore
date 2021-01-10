@@ -3,4 +3,4 @@ Cargo.lock
 /src/models/target
 /frontend/target
 /frontend/static
-!/src/frontend/static/index.html
+!/frontend/static/index.html
