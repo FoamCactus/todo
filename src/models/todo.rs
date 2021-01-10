@@ -35,7 +35,7 @@ impl TodoBuilder {
             project_id,
             title: String::from(title),
             details: None,
-            uuid: Some(uuid::Uuid::new_v4().to_string())
+            uuid: Some(Uuid::new_v4().to_string())
         }
     }
 

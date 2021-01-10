@@ -6,7 +6,7 @@ use yew_styles::button::Button;
 use log::info;
 use crate::project::ProjectComp;
 use crate::error::ServiceError;
-use crate::service::ProjectService;
+use crate::service::{ProjectService,Service};
 use crate::models::project;
 
 pub struct ProjectListComponent {

@@ -1,9 +1,16 @@
 use yew::{ShouldRender,Html,html,ComponentLink,Component,Properties,Callback};
+use crate::service::{Service,TodoService};
 use crate::models::project::Project;
 
 #[derive(Properties,Clone)]
 pub struct Props{
-    pub data: Project
+    pub data: Project,
+    #[prop_or(false)]
+    pub open: bool
+}
+
+pub enum Msg {
+    ToggleOpen
 }
 
 pub struct ProjectComp {
@@ -21,12 +28,18 @@ impl Component for ProjectComp {
         }
     }
 
-    fn update(&mut self, _msg:Self::Message) -> ShouldRender {
-        false 
+    fn update(&mut self, msg:Self::Message) -> ShouldRender {
+        match msg {
+            ToggleOpen => {
+                self.props.open = !self.props.open;
+                true
+            }
+        }
     }
 
-    fn change(&mut self, _props: Self::Properties) -> ShouldRender {
-        false
+    fn change(&mut self, props: Self::Properties) -> ShouldRender {
+        self.props = props;
+        true
     }
 
     fn view(&self) -> Html {
