@@ -55,14 +55,19 @@ impl Service for TodoService {
         }
     }
     fn all(&mut self, callback: Callback<Result<Vec<Self::Data>,ServiceError>>) -> FetchTask {
-        self.requests.get("api/todo".to_string(),callback)
+        self.requests.get("api/todo/".to_string(),callback)
     }
 
     fn save(&mut self, new: Self::NewData, callback: Callback<Result<Option<Self::Data>,ServiceError>>) -> FetchTask {
-       self.requests.post("api/todo".to_string(),new,callback) 
+       self.requests.post("api/todo/".to_string(),new,callback) 
     }
 
-    
-
 }
+
+ impl TodoService {
+    pub fn get_by_project(&mut self,id:i32, callback: Callback<Result<Vec<Todo>,ServiceError>>) -> FetchTask {
+        self.requests.get(format!("api/todo/project/{}",id),callback)
+
+    }
+ }
 

@@ -1,3 +1,4 @@
+#![recursion_limit="512"]
 use yew::App;
 use wasm_bindgen::prelude::*;
 use yew::{ShouldRender,Html,html,ComponentLink,Component,Properties,Callback};

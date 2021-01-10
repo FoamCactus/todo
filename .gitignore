@@ -1,5 +1,6 @@
 /target
 Cargo.lock
+database.sqlite3
 /src/models/target
 /frontend/target
 /frontend/static
