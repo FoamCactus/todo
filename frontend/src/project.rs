@@ -1,5 +1,6 @@
 use yew::{ShouldRender,Html,html,ComponentLink,Component,Properties,Callback};
 use yew::{MouseEvent,ChangeData};
+use crate::todo::TodoComp;
 use crate::service::{Service,TodoService};
 use crate::error::ServiceError;
 use crate::models::project::Project;
@@ -114,19 +115,8 @@ impl Component for ProjectComp {
         let update_todo_details = self.link.callback(|data:ChangeData| Msg::SetDetails(data));
 
         html!{
-            <div>
+            <div ondblclick=open_click>
                 {&self.props.data.title}
-                <Button
-                    onclick_signal=open_click
-                 >
-                 {
-                     if self.props.open {
-                         html!{{"-"}}
-                     }else {
-                         html!{{"+"}}
-                     }
-                 }
-                 </Button>
                  {
                      if self.props.open {
                          html!{
@@ -153,7 +143,7 @@ impl Component for ProjectComp {
                                      self.todos.iter().rev().map(|t|{
                                          html!{
                                              <li>
-                                                 {&t.title}
+                                                 <TodoComp data=t/>
                                              </li>
                                          }
 

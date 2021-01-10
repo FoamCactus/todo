@@ -6,6 +6,7 @@ mod project;
 mod projectList;
 mod error;
 mod service;
+mod todo;
 use models;
 use projectList::ProjectListComponent;
 use console_log;
