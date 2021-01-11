@@ -1,18 +1,18 @@
-#![recursion_limit="512"]
-use yew::App;
+#![recursion_limit = "512"]
 use wasm_bindgen::prelude::*;
-use yew::{ShouldRender,Html,html,ComponentLink,Component,Properties,Callback};
-mod project;
-mod projectList;
+use yew::App;
+use yew::{html, Callback, Component, ComponentLink, Html, Properties, ShouldRender};
 mod error;
+mod project;
+mod project_list;
 mod service;
 mod todo;
-use models;
-use projectList::ProjectListComponent;
+mod todo_list;
 use console_log;
 use dotenv;
-use log::{info,debug};
-
+use log::{debug, info};
+use models;
+use project_list::ProjectListComponent;
 
 #[wasm_bindgen(start)]
 pub fn run_app() {
@@ -24,18 +24,18 @@ pub fn run_app() {
 }
 
 struct Wrapper {
-    link: ComponentLink<Self>
+    link: ComponentLink<Self>,
 }
 
 impl Component for Wrapper {
     type Properties = ();
     type Message = ();
 
-    fn create(_props: Self::Properties, link: ComponentLink<Self>)  -> Self {
-        Self{link}
+    fn create(_props: Self::Properties, link: ComponentLink<Self>) -> Self {
+        Self { link }
     }
 
-    fn update(&mut self, _msg:Self::Message) -> ShouldRender {
+    fn update(&mut self, _msg: Self::Message) -> ShouldRender {
         false
     }
 
@@ -44,10 +44,10 @@ impl Component for Wrapper {
     }
 
     fn view(&self) -> Html {
-        html!{
+        html! {
             <div>
                 {"wrapper"}
-                <ProjectListComponent/> 
+                <ProjectListComponent/>
             </div>
         }
     }

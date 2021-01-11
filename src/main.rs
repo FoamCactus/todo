@@ -34,6 +34,7 @@ async fn main() -> std::io::Result<()> {
                     .service(web::scope("/project").configure(project::scoped_config))
                     .service(web::scope("/todo").configure(todo::scoped_config)),
             )
+            .service(Files::new("/node_modules", "./frontend/node_modules/"))
             .service(Files::new("/", "./frontend/static/").index_file("index.html"))
     })
     .bind("0.0.0.0:8088")

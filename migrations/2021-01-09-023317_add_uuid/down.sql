@@ -13,14 +13,14 @@ CREATE TABLE temp_todo (
     title TEXT NOT NULL,
     details TEXT,
     uuid TEXT NOT NULL DEFAULT 0,
-    FOREIGN KEY(project_id) REFERENCES Project(id)
+    FOREIGN KEY(project_id) REFERENCES project(id)
 );
 
 INSERT INTO temp_todo values (project_id,title,details)
 SELECT project_id, title,title,details from todo;
 
 INSERT INTO temp_project values (id,title)
-SELECT id,title from from project;
+SELECT id,title from project;
 
 DROP TABLE todo;
 DROP TABLE project;

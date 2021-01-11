@@ -2,6 +2,7 @@
 Cargo.lock
 database.sqlite3
 /src/models/target
+/frontend/node_modules
 /frontend/target
 /frontend/static
 !/frontend/static/index.html

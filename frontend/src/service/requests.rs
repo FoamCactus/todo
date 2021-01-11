@@ -1,13 +1,12 @@
-use serde::{Deserialize,Serialize};
-use yew::format::Json;
 use crate::error::ServiceError as Error;
+use dotenv_codegen::dotenv;
+use serde::{Deserialize, Serialize};
 use yew::callback::Callback;
+use yew::format::Json;
 use yew::format::{Nothing, Text};
 use yew::services::fetch::{FetchService, FetchTask, Request, Response};
-use dotenv_codegen::dotenv;
 
 const API_ROOT: &str = dotenv!("API_ROOT");
-
 
 #[derive(Default, Debug)]
 pub struct Requests {}
@@ -44,7 +43,7 @@ impl Requests {
                 callback.emit(Err(Error::E))
             }
         };
-        let url = format!("{}{}",API_ROOT,url);
+        let url = format!("{}{}", API_ROOT, url);
         let builder = Request::builder()
             .method(method)
             .uri(url)

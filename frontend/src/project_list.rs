@@ -1,13 +1,13 @@
-use yew::{ShouldRender,Html,html,ComponentLink,Component,Properties,Callback};
-use yew::services::fetch::FetchTask;
-use yew::{ChangeData,MouseEvent};
-use yew_styles::forms::form_input::{FormInput,InputType};
-use yew_styles::button::Button;
-use log::info;
-use crate::project::ProjectComp;
 use crate::error::ServiceError;
-use crate::service::{ProjectService,Service};
 use crate::models::project;
+use crate::project::ProjectComp;
+use crate::service::{ProjectService, Service};
+use log::info;
+use yew::services::fetch::FetchTask;
+use yew::{html, Callback, Component, ComponentLink, Html, Properties, ShouldRender};
+use yew::{ChangeData, MouseEvent};
+use yew_styles::button::Button;
+use yew_styles::forms::form_input::{FormInput, InputType};
 
 pub struct ProjectListComponent {
     link: ComponentLink<Self>,
@@ -18,12 +18,11 @@ pub struct ProjectListComponent {
 }
 
 pub enum Msg {
-    Loaded(Result<Vec<project::Project>,ServiceError>),
+    Loaded(Result<Vec<project::Project>, ServiceError>),
     ChangeTitle(ChangeData),
     PostButton,
-    Saved(Result<Option<project::Project>,ServiceError>)
+    Saved(Result<Option<project::Project>, ServiceError>),
 }
-
 
 impl Component for ProjectListComponent {
     type Message = Msg;
@@ -34,15 +33,14 @@ impl Component for ProjectListComponent {
             projects: Vec::new(),
             task: None,
             new_project: project::NewProject::new(),
-            link
+            link,
         }
     }
     fn rendered(&mut self, first_render: bool) {
         if first_render {
-            let callback = self.link.callback(|v|Self::Message::Loaded(v));
+            let callback = self.link.callback(|v| Self::Message::Loaded(v));
             self.task = Some(self.service.all(callback));
         }
-        
     }
 
     fn update(&mut self, msg: Self::Message) -> ShouldRender {
@@ -52,31 +50,30 @@ impl Component for ProjectListComponent {
                 info!("loaded");
                 self.projects = v;
                 true
-            },
+            }
             ChangeTitle(data) => {
                 if let ChangeData::Value(v) = data {
-                    info!("setting title to: {}",v);
+                    info!("setting title to: {}", v);
                     self.new_project.set_title(&v);
                 }
                 false
-            },
+            }
             PostButton => {
                 let callback = self.link.callback(|v| Msg::Saved(v));
-                self.task = Some(self.service.save(self.new_project.clone(),callback));
+                self.task = Some(self.service.save(self.new_project.clone(), callback));
                 self.new_project = project::NewProject::new();
                 false
-            },
-            Saved(Ok(Some(proj))) =>{
+            }
+            Saved(Ok(Some(proj))) => {
                 info!("saved and returned");
                 self.projects.push(proj);
                 true
-            },
+            }
             Saved(Err(e)) => {
-                info!("{:?}",e);
+                info!("{:?}", e);
                 false
             }
-            _ => false 
-
+            _ => false,
         }
     }
 
@@ -85,15 +82,11 @@ impl Component for ProjectListComponent {
     }
 
     fn view(&self) -> Html {
-        let on_change_title = self.link.callback(
-            |change: ChangeData|
-            Msg::ChangeTitle(change)
-        );
-        let save_button = self.link.callback(
-            |_:MouseEvent|
-             Msg::PostButton
-        );
-        html!{
+        let on_change_title = self
+            .link
+            .callback(|change: ChangeData| Msg::ChangeTitle(change));
+        let save_button = self.link.callback(|_: MouseEvent| Msg::PostButton);
+        html! {
             <div>
                 <label for="newTitle">{"Title"}</label>
                 <FormInput
@@ -115,7 +108,5 @@ impl Component for ProjectListComponent {
                 }
             </div>
         }
-        
     }
-    
 }

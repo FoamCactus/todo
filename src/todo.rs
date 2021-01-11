@@ -11,6 +11,7 @@ pub fn scoped_config(cfg: &mut ServiceConfig) {
     cfg.service(get);
     cfg.service(save);
     cfg.service(project);
+    cfg.service(parent);
 }
 
 #[actix_web::get("/")]
@@ -31,6 +32,19 @@ async fn project(
     info!("getting all todos with project_id = {}", id);
     let connection = pool.get().expect("couldn't gets db connection'");
     match web::block(move || get_by_project(&connection, *id)).await {
+        Ok(vec) => Ok(HttpResponse::Ok().json(vec)),
+        Err(e) => Err(actix_web::Error::from(e)),
+    }
+}
+
+#[actix_web::get("/parent/{id}")]
+async fn parent(
+    pool: web::Data<DbPool>,
+    id: web::Path<i32>,
+) -> Result<HttpResponse, actix_web::Error> {
+    info!("getting all todos with parent_id = {}", id);
+    let connection = pool.get().expect("couldn't gets db connection'");
+    match web::block(move || get_by_parent(&connection, *id)).await {
         Ok(vec) => Ok(HttpResponse::Ok().json(vec)),
         Err(e) => Err(actix_web::Error::from(e)),
     }
@@ -67,4 +81,9 @@ fn new(td: NewTodo, con: &SqliteConnection) -> Result<Option<Todo>, Error> {
 fn get_by_project(con: &SqliteConnection, p_id: i32) -> Result<Vec<Todo>, Error> {
     use crate::models::schema::todo::dsl::*;
     todo.filter(project_id.eq(p_id)).load(con)
+}
+
+fn get_by_parent(con: &SqliteConnection, p_id: i32) -> Result<Vec<Todo>, Error> {
+    use crate::models::schema::todo::dsl::*;
+    todo.filter(parent_id.eq(p_id)).load(con)
 }
