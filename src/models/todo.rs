@@ -1,16 +1,19 @@
-use diesel::Queryable;
+use diesel::{Queryable,Identifiable,AsChangeset};
+
 use serde::{Serialize,Deserialize};
 use uuid::Uuid;
 use crate::schema::*;
 
-#[derive(Queryable,Serialize,Deserialize,Clone,Debug)]
+#[derive(Queryable,Serialize,Deserialize,Clone,Debug,Identifiable,AsChangeset)]
+#[table_name="todo"]
 pub struct Todo {
     pub id: i32,
     pub project_id:  Option<i32>,
     pub parent_id: Option<i32>,
     pub title: String,
     pub details: Option<String>,
-    pub uuid: String
+    pub uuid: String,
+    pub complete: bool
 }
 #[derive(Insertable,Serialize,Deserialize,Clone,Debug)]
 #[table_name="todo"]
@@ -20,13 +23,14 @@ pub struct NewTodo {
     pub title: String,
     pub details: Option<String>,
     pub uuid: Option<String>,
+    pub complete: bool
 }
 
 pub struct TodoBuilder{
     title: String,
     details: Option<String>,
-    uuid: Option<String>
-
+    uuid: Option<String>,
+    complete: bool
 }
 
 
@@ -35,9 +39,16 @@ impl TodoBuilder {
         Self {
             title: String::from(title),
             details: None,
-            uuid: Some(Uuid::new_v4().to_string())
+            uuid: Some(Uuid::new_v4().to_string()),
+            complete: false
         }
     }
+
+    pub fn complete(&mut self) -> &mut Self {
+        self.complete = true;
+        self
+    }
+
     pub fn with_details(&mut self,details: &str) -> &mut Self {
         self.details = Some(String::from(details));
         self
@@ -48,7 +59,8 @@ impl TodoBuilder {
             project_id,
             title: self.title,
             details: self.details,
-            uuid: self.uuid
+            uuid: self.uuid,
+            complete: self.complete
         }
     }
 
@@ -57,7 +69,8 @@ impl TodoBuilder {
             parent_id,
             title: self.title,
             details: self.details,
-            uuid: self.uuid
+            uuid: self.uuid,
+            complete: self.complete
         }
 
     }
@@ -67,7 +80,8 @@ pub struct TodoProjectBuilder{
     project_id: i32,
     title: String,
     details: Option<String>,
-    uuid: Option<String>
+    uuid: Option<String>,
+    complete: bool
 }
 
 impl TodoProjectBuilder{
@@ -77,7 +91,8 @@ impl TodoProjectBuilder{
             parent_id: None,
             title: self.title,
             details: self.details,
-            uuid: self.uuid
+            uuid: self.uuid,
+            complete: self.complete
         }
     }
 }
@@ -86,7 +101,8 @@ pub struct TodoParentBuilder{
     parent_id: i32,
     title: String,
     details: Option<String>,
-    uuid: Option<String>
+    uuid: Option<String>,
+    complete: bool
 }
 impl TodoParentBuilder{
     pub fn build(self) -> NewTodo {
@@ -95,7 +111,8 @@ impl TodoParentBuilder{
             parent_id: Some(self.parent_id),
             title: self.title,
             details: self.details,
-            uuid: self.uuid
+            uuid: self.uuid,
+            complete: self.complete
         }
     }
 }

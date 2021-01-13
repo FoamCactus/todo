@@ -12,6 +12,7 @@ pub fn scoped_config(cfg: &mut ServiceConfig) {
     cfg.service(save);
     cfg.service(project);
     cfg.service(parent);
+    cfg.service(update);
 }
 
 #[actix_web::get("/")]
@@ -23,6 +24,16 @@ async fn get(pool: web::Data<DbPool>) -> Result<HttpResponse, actix_web::Error> 
         Err(e) => Err(actix_web::Error::from(e)),
     }
 }
+
+#[actix_web::put("/")]
+async fn update(pool: web::Data<DbPool>, data: web::Json<Todo>) -> Result<HttpResponse,actix_web::Error> {
+    let connection = pool.get().expect("couldn't gets db connection'");
+    match web::block( move || update_todo(&connection,&data)).await {
+        Ok(_) => Ok(HttpResponse::Ok().finish()),
+        Err(e) => Ok(HttpResponse::NotModified().json(e.to_string()))
+    }
+}
+
 
 #[actix_web::get("/project/{id}")]
 async fn project(
@@ -86,4 +97,9 @@ fn get_by_project(con: &SqliteConnection, p_id: i32) -> Result<Vec<Todo>, Error>
 fn get_by_parent(con: &SqliteConnection, p_id: i32) -> Result<Vec<Todo>, Error> {
     use crate::models::schema::todo::dsl::*;
     todo.filter(parent_id.eq(p_id)).load(con)
+}
+
+fn update_todo(con: &SqliteConnection, data: &Todo) -> Result<(),diesel::result::Error> {
+    diesel::update(data).set(data).execute(con)?;
+    Ok(())
 }

@@ -14,6 +14,7 @@ table! {
         title -> Text,
         details -> Nullable<Text>,
         uuid -> Text,
+        complete -> Bool,
     }
 }
 

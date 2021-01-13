@@ -90,5 +90,10 @@ impl TodoService {
             .get(format!("api/todo/parent/{}", id), callback)
     }
 
+    pub fn mark_complete(&mut self,id: i32,callback: Callback<Result<Todo, ServiceError>>)-> FetchTask {
+        self.requests.put("api/todo/complete")
+        
+    }
+
 }
 

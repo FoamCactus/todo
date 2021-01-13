@@ -72,4 +72,19 @@ impl Requests {
         let body: Text = Json(&body).into();
         self.builder("POST", url, body, callback)
     }
+
+    pub fn put<B, T>(
+        &mut self,
+        url: String,
+        body: B,
+        callback: Callback<Result<T, Error>>,
+    ) -> FetchTask
+    where
+        for<'de> T: Deserialize<'de> + 'static + std::fmt::Debug,
+        B: Serialize,
+    {
+        let body: Text = Json(&body).into();
+        self.builder("PUT", url, body, callback)
+    }
+
 }
