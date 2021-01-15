@@ -1,17 +1,17 @@
 use crate::error::ServiceError;
-use crate::models::todo::{NewTodo, Todo, TodoBuilder};
+use crate::models::todo::{Todo, TodoBuilder};
 use crate::service::{Service, TodoService};
 use crate::todo::TodoComp;
 use yew::services::fetch::FetchTask;
-use yew::{html, Callback, Component, ComponentLink, Html, Properties, ShouldRender};
+use yew::{html, Component, ComponentLink, Html, Properties, ShouldRender};
 use yew::{ChangeData, MouseEvent};
 use yew_styles::button::Button;
 use yew_styles::forms::form_input::{FormInput, InputType};
 
-#[derive(Clone,Copy)]
+#[derive(Clone, Copy)]
 pub enum TodoID {
     Parent(i32),
-    Project(i32)
+    Project(i32),
 }
 
 pub struct TodoListComp {
@@ -26,7 +26,7 @@ pub struct TodoListComp {
 
 #[derive(Properties, Clone)]
 pub struct Props {
-    pub id: TodoID
+    pub id: TodoID,
 }
 
 pub enum Msg {
@@ -57,10 +57,9 @@ impl Component for TodoListComp {
     fn rendered(&mut self, first_render: bool) {
         if first_render {
             let callback = self.link.callback(|r| Msg::Loaded(r));
-            use TodoID;
             self.task = Some(match self.props.id {
-                TodoID::Parent(id) => self.service.get_by_parent(id ,callback),
-                TodoID::Project(id) => self.service.get_by_project(id,callback),
+                TodoID::Parent(id) => self.service.get_by_parent(id, callback),
+                TodoID::Project(id) => self.service.get_by_project(id, callback),
             });
         }
     }
@@ -92,21 +91,13 @@ impl Component for TodoListComp {
                         builder.with_details(&details);
                     }
                     match self.props.id {
-                        TodoID::Parent(id) =>{
-                            self.task = Some(
-                                self.service.save(
-                                    builder.parent(id).build(),
-                                    callback
-                                )
-                            )
-                        },
-                        TodoID::Project(id) =>{
-                            self.task = Some(
-                                self.service.save(
-                                    builder.project(id).build(),
-                                    callback
-                                )
-                            )
+                        TodoID::Parent(id) => {
+                            self.task =
+                                Some(self.service.save(builder.parent(id).build(), callback))
+                        }
+                        TodoID::Project(id) => {
+                            self.task =
+                                Some(self.service.save(builder.project(id).build(), callback))
                         }
                     }
                 }
@@ -152,7 +143,12 @@ impl Component for TodoListComp {
                     self.todos.iter().rev().map(|t|{
                         html!{
                             <li>
-                                <TodoComp data=t/>
+                                <div>
+                                    <FormInput
+                                    input_type=InputType::Checkbox
+                                    />
+                                    <TodoComp data=t/>
+                                </div>
                             </li>
                         }
 

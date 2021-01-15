@@ -86,5 +86,4 @@ impl Requests {
         let body: Text = Json(&body).into();
         self.builder("PUT", url, body, callback)
     }
-
 }

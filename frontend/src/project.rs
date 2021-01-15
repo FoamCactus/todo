@@ -1,14 +1,7 @@
-use crate::error::ServiceError;
 use crate::models::project::Project;
-use crate::models::todo::{Todo, TodoBuilder};
-use crate::service::{Service, TodoService};
-use crate::todo::TodoComp;
-use crate::todo_list::{TodoListComp,TodoID};
-use yew::services::fetch::FetchTask;
-use yew::{html, Callback, Component, ComponentLink, Html, Properties, ShouldRender};
-use yew::{ChangeData, MouseEvent};
-use yew_styles::button::Button;
-use yew_styles::forms::form_input::{FormInput, InputType};
+use crate::todo_list::{TodoID, TodoListComp};
+use yew::MouseEvent;
+use yew::{html, Component, ComponentLink, Html, Properties, ShouldRender};
 
 #[derive(Properties, Clone)]
 pub struct Props {
@@ -23,11 +16,6 @@ pub enum Msg {
 
 pub struct ProjectComp {
     link: ComponentLink<Self>,
-    service: TodoService,
-    task: Option<FetchTask>,
-    todos: Vec<Todo>,
-    title: Option<String>,
-    details: Option<String>,
     props: Props,
 }
 
@@ -35,15 +23,7 @@ impl Component for ProjectComp {
     type Message = Msg;
     type Properties = Props;
     fn create(props: Self::Properties, link: ComponentLink<Self>) -> Self {
-        Self {
-            service: TodoService::new(),
-            todos: Vec::new(),
-            task: None,
-            title: None,
-            details: None,
-            link,
-            props,
-        }
+        Self { link, props }
     }
 
     fn update(&mut self, msg: Self::Message) -> ShouldRender {
@@ -53,7 +33,6 @@ impl Component for ProjectComp {
                 self.props.open = !self.props.open;
                 true
             }
-            _ => false,
         }
     }
 

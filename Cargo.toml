@@ -18,6 +18,6 @@ actix-session = "0.3"
 actix = "0.10.0-alpha.3"
 log = "0.4"
 pretty_env_logger = "0.4"
-models = {path="src/models"}
+models = {path="src/models", features= ["backend"]}
 
 

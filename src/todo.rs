@@ -1,10 +1,7 @@
-use crate::models::todo::{NewTodo, Todo};
+use crate::models::todo::{NewTodo, Todo,get_all,update_todo,get_by_project,get_by_parent,new};
 use crate::DbPool;
 use actix_web::web;
 use actix_web::web::{HttpResponse, ServiceConfig};
-use diesel::prelude::*;
-use diesel::result::Error;
-use diesel::sqlite::SqliteConnection;
 use log::info;
 
 pub fn scoped_config(cfg: &mut ServiceConfig) {
@@ -73,33 +70,3 @@ async fn save(
     }
 }
 
-fn get_all(con: &SqliteConnection) -> Result<Vec<Todo>, Error> {
-    use crate::models::schema::todo::dsl::*;
-    todo.load::<Todo>(con)
-}
-
-fn new(td: NewTodo, con: &SqliteConnection) -> Result<Option<Todo>, Error> {
-    use crate::models::schema::todo::dsl::*;
-    diesel::insert_into(todo).values(&td).execute(con)?;
-    info!("saving todo: {:?}",td);
-    if let Some(s) = td.uuid {
-        todo.filter(uuid.eq(s)).first::<Todo>(con).optional()
-    }else {
-        Ok(None)
-    }
-}
-
-fn get_by_project(con: &SqliteConnection, p_id: i32) -> Result<Vec<Todo>, Error> {
-    use crate::models::schema::todo::dsl::*;
-    todo.filter(project_id.eq(p_id)).load(con)
-}
-
-fn get_by_parent(con: &SqliteConnection, p_id: i32) -> Result<Vec<Todo>, Error> {
-    use crate::models::schema::todo::dsl::*;
-    todo.filter(parent_id.eq(p_id)).load(con)
-}
-
-fn update_todo(con: &SqliteConnection, data: &Todo) -> Result<(),diesel::result::Error> {
-    diesel::update(data).set(data).execute(con)?;
-    Ok(())
-}

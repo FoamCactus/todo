@@ -1,7 +1,7 @@
 #![recursion_limit = "512"]
 use wasm_bindgen::prelude::*;
 use yew::App;
-use yew::{html, Callback, Component, ComponentLink, Html, Properties, ShouldRender};
+use yew::{html, Component, ComponentLink, Html, ShouldRender};
 mod error;
 mod project;
 mod project_list;
@@ -10,7 +10,7 @@ mod todo;
 mod todo_list;
 use console_log;
 use dotenv;
-use log::{debug, info};
+use log::info;
 use models;
 use project_list::ProjectListComponent;
 
@@ -23,16 +23,14 @@ pub fn run_app() {
     App::<Wrapper>::new().mount_to_body();
 }
 
-struct Wrapper {
-    link: ComponentLink<Self>,
-}
+struct Wrapper {}
 
 impl Component for Wrapper {
     type Properties = ();
     type Message = ();
 
-    fn create(_props: Self::Properties, link: ComponentLink<Self>) -> Self {
-        Self { link }
+    fn create(_props: Self::Properties, _link: ComponentLink<Self>) -> Self {
+        Self {}
     }
 
     fn update(&mut self, _msg: Self::Message) -> ShouldRender {

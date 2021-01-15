@@ -1,15 +1,12 @@
-use crate::models::project::{NewProject, Project};
+use crate::models::project::{NewProject,save,get_all};
 use crate::DbPool;
 use actix_web::web;
 use actix_web::web::{HttpResponse, ServiceConfig};
-use diesel::prelude::*;
-use diesel::result::Error;
-use diesel::sqlite::SqliteConnection;
 use log::info;
 
 pub fn scoped_config(cfg: &mut ServiceConfig) {
     cfg.service(get);
-    cfg.service(save);
+    cfg.service(save_project);
 }
 
 #[actix_web::get("/")]
@@ -23,28 +20,14 @@ async fn get(pool: web::Data<DbPool>) -> Result<HttpResponse, actix_web::Error> 
 }
 
 #[actix_web::post("/")]
-async fn save(
+async fn save_project(
     pool: web::Data<DbPool>,
     proj: web::Json<NewProject>,
 ) -> Result<HttpResponse, actix_web::Error> {
     let connection = pool.get().expect("couldn't get db connection'");
-    match web::block(move || new(proj.clone(), &connection)).await {
+    match web::block(move || save(proj.clone(), &connection)).await {
         Ok(proj) => Ok(HttpResponse::Ok().json(proj)),
         Err(e) => Err(actix_web::Error::from(e)),
     }
 }
 
-fn get_all(con: &SqliteConnection) -> Result<Vec<Project>, Error> {
-    use crate::models::schema::project::dsl::*;
-    project.load::<Project>(con)
-}
-
-fn new(proj: NewProject, con: &SqliteConnection) -> Result<Option<Project>, Error> {
-    use crate::models::schema::project::dsl::*;
-    diesel::insert_into(project).values(&proj).execute(con)?;
-    if let Some(s) = proj.uuid {
-        project.filter(uuid.eq(s)).first::<Project>(con).optional()
-    } else {
-        Ok(None)
-    }
-}

@@ -1,10 +1,19 @@
+#[cfg(feature= "backend")]
 use diesel::{Queryable,Identifiable,AsChangeset};
-
+#[cfg(feature= "backend")]
+use diesel::result::Error;
+#[cfg(feature= "backend")]
+use diesel::sqlite::SqliteConnection;
+#[cfg(feature= "backend")]
+use diesel::prelude::*;
 use serde::{Serialize,Deserialize};
+use log::info;
 use uuid::Uuid;
+#[cfg(feature= "backend")]
 use crate::schema::*;
 
-#[derive(Queryable,Serialize,Deserialize,Clone,Debug,Identifiable,AsChangeset)]
+#[derive(Serialize,Deserialize,Clone,Debug)]
+#[cfg_attr(feature = "backend", derive(Queryable,Identifiable,AsChangeset))]
 #[table_name="todo"]
 pub struct Todo {
     pub id: i32,
@@ -15,7 +24,8 @@ pub struct Todo {
     pub uuid: String,
     pub complete: bool
 }
-#[derive(Insertable,Serialize,Deserialize,Clone,Debug)]
+#[derive(Serialize,Deserialize,Clone,Debug)]
+#[cfg_attr(feature = "backend", derive(Insertable))]
 #[table_name="todo"]
 pub struct NewTodo {
     pub project_id:  Option<i32>,
@@ -115,5 +125,41 @@ impl TodoParentBuilder{
             complete: self.complete
         }
     }
+}
+
+#[cfg(feature= "backend")]
+pub fn get_all(con: &SqliteConnection) -> Result<Vec<Todo>, Error> {
+    use crate::schema::todo::dsl::*;
+    todo.load::<Todo>(con)
+}
+
+#[cfg(feature= "backend")]
+pub fn new(td: NewTodo, con: &SqliteConnection) -> Result<Option<Todo>, Error> {
+    use crate::schema::todo::dsl::*;
+    diesel::insert_into(todo).values(&td).execute(con)?;
+    info!("saving todo: {:?}",td);
+    if let Some(s) = td.uuid {
+        todo.filter(uuid.eq(s)).first::<Todo>(con).optional()
+    }else {
+        Ok(None)
+    }
+}
+
+#[cfg(feature= "backend")]
+pub fn get_by_project(con: &SqliteConnection, p_id: i32) -> Result<Vec<Todo>, Error> {
+    use crate::schema::todo::dsl::*;
+    todo.filter(project_id.eq(p_id)).load(con)
+}
+
+#[cfg(feature= "backend")]
+pub fn get_by_parent(con: &SqliteConnection, p_id: i32) -> Result<Vec<Todo>, Error> {
+    use crate::schema::todo::dsl::*;
+    todo.filter(parent_id.eq(p_id)).load(con)
+}
+
+#[cfg(feature= "backend")]
+pub fn update_todo(con: &SqliteConnection, data: &Todo) -> Result<(),diesel::result::Error> {
+    diesel::update(data).set(data).execute(con)?;
+    Ok(())
 }
 

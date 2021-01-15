@@ -1,22 +1,24 @@
 use crate::models::todo::Todo;
-use crate::todo_list::{TodoListComp,TodoID};
-use yew::{html, Callback, Component, ComponentLink, Html, Properties, ShouldRender};
+use crate::todo_list::{TodoID, TodoListComp};
+use log::debug;
+use yew::{html, Component, ComponentLink, Html, Properties, ShouldRender};
 
 pub struct TodoComp {
     link: ComponentLink<Self>,
     props: Props,
-    open: bool
+    open: bool,
 }
 
 #[derive(Properties, Clone)]
 pub struct Props {
     pub data: Todo,
     #[prop_or(false)]
-    pub open: bool
+    pub open: bool,
 }
 
 pub enum Msg {
-    ToggleOpen
+    ToggleOpen,
+    NoOp,
 }
 
 impl Component for TodoComp {
@@ -36,8 +38,11 @@ impl Component for TodoComp {
             ToggleOpen => {
                 self.open = !self.open;
                 true
-            },
-            _ => false 
+            }
+            NoOp => {
+                debug!("here");
+                false
+            }
         }
     }
 
@@ -47,9 +52,10 @@ impl Component for TodoComp {
 
     fn view(&self) -> Html {
         let toggle = self.link.callback(|_| Msg::ToggleOpen);
+        let complete = self.link.callback(|_| Msg::NoOp);
         html! {
             <div >
-                <b onclick=toggle> {&self.props.data.title} </b>
+                <b ondblclick=complete onclick=toggle> {&self.props.data.title} </b>
                 {
                     if let Some(details) = &self.props.data.details{
                         html!{<>{" - "}{details}</>}

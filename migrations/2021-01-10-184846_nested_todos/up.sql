@@ -13,7 +13,7 @@ CREATE TABLE temp_todo (
 );
 
 INSERT INTO temp_todo (id,project_id,title,details,uuid)
-SELECT id,project_id,title,details,uuid from todo where true;
+SELECT id,project_id,title,details,uuid from todo;
 
 DROP TABLE todo;
 

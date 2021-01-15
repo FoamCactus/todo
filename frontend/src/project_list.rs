@@ -4,7 +4,7 @@ use crate::project::ProjectComp;
 use crate::service::{ProjectService, Service};
 use log::info;
 use yew::services::fetch::FetchTask;
-use yew::{html, Callback, Component, ComponentLink, Html, Properties, ShouldRender};
+use yew::{html, Component, ComponentLink, Html, ShouldRender};
 use yew::{ChangeData, MouseEvent};
 use yew_styles::button::Button;
 use yew_styles::forms::form_input::{FormInput, InputType};
