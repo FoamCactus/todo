@@ -2,10 +2,12 @@ use crate::error::ServiceError;
 use crate::models::todo::{Todo, TodoBuilder};
 use crate::service::{Service, TodoService};
 use crate::todo::TodoComp;
+use log::{info,error};
 use yew::services::fetch::FetchTask;
 use yew::{html, Component, ComponentLink, Html, Properties, ShouldRender};
 use yew::{ChangeData, MouseEvent};
 use yew_styles::button::Button;
+use yew_styles::styles::{Palette,Style,Size};
 use yew_styles::forms::form_input::{FormInput, InputType};
 
 #[derive(Clone, Copy)]
@@ -36,6 +38,8 @@ pub enum Msg {
     SetDetails(ChangeData),
     SaveNew,
     Push(Todo),
+    Remove(i32),
+    Complete(usize)
 }
 
 impl Component for TodoListComp {
@@ -104,8 +108,22 @@ impl Component for TodoListComp {
                 false
             }
             Push(t) => {
+                info!("{:?}",t);
                 self.todos.push(t);
                 true
+            },
+            Complete(t) => {
+                info!("index removed:{}",t);
+                let mut complete_todo = self.todos.remove(t);
+                complete_todo.complete = true;
+                info!("todo:{:?}",complete_todo);
+                let callback = self.link.callback(|_| Msg::NoOp);
+                self.task = Some( self.service.mark_complete(complete_todo,callback));
+                true
+            },
+            NoOp => {
+                info!("here");
+                false
             }
             _ => false,
         }
@@ -116,11 +134,26 @@ impl Component for TodoListComp {
     }
 
     fn view(&self) -> Html {
+        html! {
+            <div>
+                {self.input_html()}
+                <ul>
+                {
+                    self.list_todos()
+                }
+                </ul>
+            </div>
+        }
+    }
+}
+
+impl TodoListComp {
+    fn input_html(&self) -> Html {
         let save_click = self.link.callback(|_: MouseEvent| Msg::SaveNew);
         let update_todo_title = self.link.callback(|data: ChangeData| Msg::SetTitle(data));
         let update_todo_details = self.link.callback(|data: ChangeData| Msg::SetDetails(data));
         html! {
-            <div>
+            <>
                 <FormInput
                     input_type=InputType::Text
                     required=true
@@ -138,24 +171,31 @@ impl Component for TodoListComp {
                 >
                 {"Save"}
                 </Button>
-                <ul>
-                {
-                    self.todos.iter().rev().map(|t|{
-                        html!{
-                            <li>
-                                <div>
-                                    <FormInput
-                                    input_type=InputType::Checkbox
-                                    />
-                                    <TodoComp data=t/>
-                                </div>
-                            </li>
-                        }
-
-                    }).collect::<Html>()
-                }
-                </ul>
-            </div>
+            </>
         }
     }
+
+    fn list_todos(&self) -> Html {
+        self.todos.iter().enumerate().map(|t| self.single_todo(t)).collect::<Html>()
+    }
+
+    fn single_todo(&self, (place,todo):(usize,&Todo)) -> Html {
+        let comp = self.link.callback(move |_|{ Msg::Complete(place)});
+        html! {
+            <li key=todo.id>
+                <div>
+                    <Button
+                        onclick_signal=comp
+                        button_palette=Palette::Primary
+                        button_style=Style::Light
+                        button_size=Size::Small
+                    >
+                        {"Complete"}
+                    </Button>
+                    <TodoComp data=todo/>
+                </div>
+            </li>
+        }
+    }
+
 }

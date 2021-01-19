@@ -12,9 +12,9 @@ use uuid::Uuid;
 #[cfg(feature= "backend")]
 use crate::schema::*;
 
-#[derive(Serialize,Deserialize,Clone,Debug)]
 #[cfg_attr(feature = "backend", derive(Queryable,Identifiable,AsChangeset))]
-#[table_name="todo"]
+#[cfg_attr(feature = "backend",table_name="todo")]
+#[derive(Serialize,Deserialize,Clone,Debug,Eq,PartialEq)]
 pub struct Todo {
     pub id: i32,
     pub project_id:  Option<i32>,
@@ -26,7 +26,7 @@ pub struct Todo {
 }
 #[derive(Serialize,Deserialize,Clone,Debug)]
 #[cfg_attr(feature = "backend", derive(Insertable))]
-#[table_name="todo"]
+#[cfg_attr(feature = "backend",table_name="todo")]
 pub struct NewTodo {
     pub project_id:  Option<i32>,
     pub parent_id: Option<i32>,
@@ -46,6 +46,7 @@ pub struct TodoBuilder{
 
 impl TodoBuilder {
     pub fn new(title: &str) -> Self {
+        info!("building new todo");
         Self {
             title: String::from(title),
             details: None,

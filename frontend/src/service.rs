@@ -96,6 +96,6 @@ impl TodoService {
         callback: Callback<Result<Todo, ServiceError>>,
     ) -> FetchTask {
         self.requests
-            .put("api/todo/complete".to_string(), data, callback)
+            .put("api/todo/".to_string(), data, callback)
     }
 }

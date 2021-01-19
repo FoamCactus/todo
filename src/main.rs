@@ -6,14 +6,12 @@ use diesel::sqlite::SqliteConnection;
 use dotenv::dotenv;
 use log::info;
 use std::env;
-//use actix_files::Files;
 use models;
 mod project;
 mod todo;
 
 type Connection = SqliteConnection;
 type DbPool = r2d2::Pool<ConnectionManager<Connection>>;
-type DieselError = diesel::result::Error;
 
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {

@@ -23,7 +23,7 @@ pub struct Project{
 
 #[derive(Serialize,Deserialize,Clone,Debug)]
 #[cfg_attr(feature = "backend", derive(Insertable))]
-#[table_name="project"]
+#[cfg_attr(feature = "backend",table_name="project")]
 pub struct NewProject {
     pub title: String,
     pub uuid: Option<String>
