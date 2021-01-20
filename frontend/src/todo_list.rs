@@ -3,7 +3,7 @@ use crate::models::todo::{Todo, TodoBuilder};
 use crate::service::{Service, TodoService};
 use crate::todo::TodoComp;
 use wasm_bindgen::JsCast;
-use log::{info,error};
+use log::info;
 use yew::services::fetch::FetchTask;
 use yew::{html, Component, ComponentLink, Html, Properties, ShouldRender};
 use yew::{ChangeData, MouseEvent};
@@ -16,7 +16,7 @@ use yew_styles::forms::form_label::FormLabel;
 use yew_styles::forms::form_group::{FormGroup,Orientation};
 use yew_styles::layouts::container::{Container,Wrap,Direction,AlignContent};
 use yew_styles::layouts::container::Mode::SafeMode;
-use yew_styles::layouts::item::{Item,ItemLayout};
+use yew_styles::layouts::item::Item;
 use yew_styles::layouts::item::ItemLayout::{ItXs,ItS,ItM,ItL,ItXl};
 
 
@@ -52,7 +52,6 @@ pub enum Msg {
     SetDetails(ChangeData),
     SaveNew,
     Push(Todo),
-    Remove(i32),
     Complete(usize),
     ToggleOpen
 }
