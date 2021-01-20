@@ -2,6 +2,8 @@ use crate::models::todo::Todo;
 use crate::todo_list::{TodoID, TodoListComp, Msg as ParentMsg};
 use log::{debug,info};
 use yew::{html, Component, ComponentLink, Html, Properties, ShouldRender};
+use yew_styles::layouts::container::{Container,Wrap,Direction};
+use yew_styles::layouts::item::{Item,ItemLayout};
 
 pub struct TodoComp {
     link: ComponentLink<Self>,
@@ -54,25 +56,33 @@ impl Component for TodoComp {
         info!("rendering: {:?}",self.props.data);
         let toggle = self.link.callback(|_| Msg::ToggleOpen);
         html! {
-            <div >
-                <b onclick=toggle> {&self.props.data.title} </b>
-                {
-                    if let Some(details) = &self.props.data.details{
-                        html!{<>{" - "}{details}</>}
-                    }else {
-                        html!{}
-                    }
-                }
-                {
-                    if self.open {
-                        html!{
-                            <TodoListComp id=TodoID::Parent(self.props.data.id)/>
+            <Container direction=Direction::Column wrap=Wrap::Wrap>
+                <Item layouts=vec!(ItemLayout::ItXs(50)) >
+                    <b onclick=toggle> {&self.props.data.title} </b>
+                    {
+                        if let Some(details) = &self.props.data.details{
+                            html!{<>{" - "}{details}</>}
+                        }else {
+                            html!{}
                         }
-                    }else {
-                        html!{}
                     }
-                }
-            </div>
+                </Item>
+                <Item layouts=vec!(ItemLayout::ItXs(4)) >
+                {self.list_data()}
+                </Item>
+            </Container>
+        }
+    }
+}
+
+impl TodoComp {
+    pub fn list_data(&self) -> Html {
+        if self.open {
+            html!{
+                <TodoListComp id=TodoID::Parent(self.props.data.id)/>
+            }
+        }else {
+            html!{}
         }
     }
 }

@@ -149,13 +149,13 @@ pub fn new(td: NewTodo, con: &SqliteConnection) -> Result<Option<Todo>, Error> {
 #[cfg(feature= "backend")]
 pub fn get_by_project(con: &SqliteConnection, p_id: i32) -> Result<Vec<Todo>, Error> {
     use crate::schema::todo::dsl::*;
-    todo.filter(project_id.eq(p_id)).load(con)
+    todo.filter(project_id.eq(p_id).and(complete.eq(false))).load(con)
 }
 
 #[cfg(feature= "backend")]
 pub fn get_by_parent(con: &SqliteConnection, p_id: i32) -> Result<Vec<Todo>, Error> {
     use crate::schema::todo::dsl::*;
-    todo.filter(parent_id.eq(p_id)).load(con)
+    todo.filter(parent_id.eq(p_id).and(complete.eq(false))).load(con)
 }
 
 #[cfg(feature= "backend")]

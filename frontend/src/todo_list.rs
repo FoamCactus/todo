@@ -9,6 +9,12 @@ use yew::{ChangeData, MouseEvent};
 use yew_styles::button::Button;
 use yew_styles::styles::{Palette,Style,Size};
 use yew_styles::forms::form_input::{FormInput, InputType};
+use yew_styles::forms::form_label::FormLabel;
+use yew_styles::forms::form_group::{FormGroup,Orientation};
+use yew_styles::layouts::container::{Container,Wrap,Direction};
+use yew_styles::layouts::item::{Item,ItemLayout};
+use yew_styles::layouts::item::ItemLayout::{ItXs,ItS,ItM,ItL,ItXl};
+
 
 #[derive(Clone, Copy)]
 pub enum TodoID {
@@ -152,26 +158,51 @@ impl TodoListComp {
         let save_click = self.link.callback(|_: MouseEvent| Msg::SaveNew);
         let update_todo_title = self.link.callback(|data: ChangeData| Msg::SetTitle(data));
         let update_todo_details = self.link.callback(|data: ChangeData| Msg::SetDetails(data));
+        let id_text = match self.props.id {
+            TodoID::Parent(id) => format!("parent_{}",id),
+            TodoID::Project(id) => format!("project_{}",id),
+        };
+        let button_layout = vec!(ItXs(1),ItS(1),ItM(1),ItL(1),ItXl(2));
+        let title_layout = vec!(ItXs(4),ItS(4),ItM(4),ItL(4),ItXl(4));
+        let details_layout = vec!(ItXs(5),ItS(5),ItM(5),ItL(5),ItXl(4));
         html! {
-            <>
-                <FormInput
-                    input_type=InputType::Text
-                    required=true
-                    name="title"
-                    onchange_signal=update_todo_title
-                />
-                <FormInput
-                    input_type=InputType::Text
-                    required=false
-                    name="details"
-                    onchange_signal=update_todo_details
-                />
-                <Button
-                    onclick_signal=save_click
-                >
-                {"Save"}
-                </Button>
-            </>
+            <Container direction=Direction::Row wrap=Wrap::Wrap>
+                <Item layouts=title_layout>
+                    <FormGroup orientation=Orientation::Horizontal>
+                        <FormLabel text="Title: " label_for=format!("title_{}",id_text)/>
+                        <FormInput
+                            id=format!("title_{}",id_text)
+                            input_type=InputType::Text
+                            required=true
+                            underline=true
+                            input_size=Size::Small
+                            name="title"
+                            onchange_signal=update_todo_title
+                        />
+                    </FormGroup>
+                </Item>
+                <Item layouts=details_layout>
+                    <FormGroup orientation=Orientation::Horizontal>
+                        <FormLabel text="Details: " label_for=format!("details_{}",id_text)/>
+                        <FormInput
+                            id=format!("details_{}",id_text)
+                            input_type=InputType::Text
+                            underline=true
+                            required=false
+                            input_size=Size::Small
+                            name="details"
+                            onchange_signal=update_todo_details
+                        />
+                    </FormGroup>
+                </Item>
+                <Item layouts=button_layout>
+                    <Button
+                        onclick_signal=save_click
+                    >
+                    {"Save"}
+                    </Button>
+                </Item>
+            </Container>
         }
     }
 
@@ -183,17 +214,19 @@ impl TodoListComp {
         let comp = self.link.callback(move |_|{ Msg::Complete(place)});
         html! {
             <li key=todo.id>
-                <div>
-                    <Button
-                        onclick_signal=comp
-                        button_palette=Palette::Primary
-                        button_style=Style::Light
-                        button_size=Size::Small
-                    >
-                        {"Complete"}
-                    </Button>
+                <Container direction=Direction::Row wrap=Wrap::Wrap>
+                    <Item layouts=vec!(ItemLayout::ItXs(1))>
+                        <Button
+                            onclick_signal=comp
+                            button_palette=Palette::Primary
+                            button_style=Style::Light
+                            button_size=Size::Small
+                        >
+                            {"Complete"}
+                        </Button>
+                    </Item>
                     <TodoComp data=todo/>
-                </div>
+                </Container>
             </li>
         }
     }
