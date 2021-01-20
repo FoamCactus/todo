@@ -3,11 +3,15 @@ use crate::models::project;
 use crate::project::ProjectComp;
 use crate::service::{ProjectService, Service};
 use log::info;
+use wasm_bindgen::JsCast;
+use yew::web_sys::HtmlInputElement;
+use yew::utils;
 use yew::services::fetch::FetchTask;
 use yew::{html, Component, ComponentLink, Html, ShouldRender};
 use yew::{ChangeData, MouseEvent};
 use yew_styles::button::Button;
 use yew_styles::forms::form_input::{FormInput, InputType};
+use yew_styles::styles::Size;
 
 pub struct ProjectListComponent {
     link: ComponentLink<Self>,
@@ -66,6 +70,7 @@ impl Component for ProjectListComponent {
             }
             Saved(Ok(Some(proj))) => {
                 info!("saved and returned");
+                self.remove_input_values();
                 self.projects.push(proj);
                 true
             }
@@ -94,6 +99,8 @@ impl Component for ProjectListComponent {
                     required=true
                     name="newTitle"
                     id="newTitle"
+                    input_size=Size::Small
+                    underline=true
                     onchange_signal=on_change_title
                 />
                 <Button
@@ -107,6 +114,22 @@ impl Component for ProjectListComponent {
                     ).collect::<Html>()
                 }
             </div>
+        }
+    }
+}
+
+impl ProjectListComponent {
+
+    fn remove_input_values(&self) {
+        let input_ids = vec!["newTitle"];
+        for id in input_ids {
+            let input_from_element = utils::document()
+                .get_element_by_id(&id)
+                .unwrap()
+                .dyn_into::<HtmlInputElement>()
+                .unwrap();
+
+            input_from_element.set_value("");
         }
     }
 }

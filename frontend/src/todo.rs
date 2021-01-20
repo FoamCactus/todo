@@ -4,18 +4,18 @@ use log::{debug,info};
 use yew::{html, Component, ComponentLink, Html, Properties, ShouldRender};
 use yew_styles::layouts::container::{Container,Wrap,Direction};
 use yew_styles::layouts::item::{Item,ItemLayout};
+use yew::Callback;
+use yew::MouseEvent;
 
 pub struct TodoComp {
     link: ComponentLink<Self>,
     props: Props,
-    open: bool,
 }
 
-#[derive(Properties, Clone,PartialEq,Eq)]
+#[derive(Properties, Clone)]
 pub struct Props {
     pub data: Todo,
-    #[prop_or(false)]
-    pub open: bool,
+    pub on_click_signal: Callback<MouseEvent>,
 }
 
 pub enum Msg {
@@ -28,37 +28,25 @@ impl Component for TodoComp {
     type Message = Msg;
     fn create(props: Self::Properties, link: ComponentLink<Self>) -> Self {
         Self {
-            open: props.open,
             link,
             props,
         }
     }
 
-    fn update(&mut self, msg: Self::Message) -> ShouldRender {
-        use Msg::*;
-        match msg {
-            ToggleOpen => {
-                self.open = !self.open;
-                true
-            }
-            NoOp => {
-                debug!("here");
-                false
-            }
-        }
+    fn update(&mut self, _msg: Self::Message) -> ShouldRender {
+        false
     }
 
     fn change(&mut self, props: Self::Properties) -> ShouldRender {
-        props == self.props
+        true
     }
 
+
     fn view(&self) -> Html {
-        info!("rendering: {:?}",self.props.data);
-        let toggle = self.link.callback(|_| Msg::ToggleOpen);
         html! {
             <Container direction=Direction::Column wrap=Wrap::Wrap>
                 <Item layouts=vec!(ItemLayout::ItXs(50)) >
-                    <b onclick=toggle> {&self.props.data.title} </b>
+                    <b onclick=self.props.on_click_signal.clone()> {&self.props.data.title} </b>
                     {
                         if let Some(details) = &self.props.data.details{
                             html!{<>{" - "}{details}</>}
@@ -67,22 +55,8 @@ impl Component for TodoComp {
                         }
                     }
                 </Item>
-                <Item layouts=vec!(ItemLayout::ItXs(4)) >
-                {self.list_data()}
-                </Item>
             </Container>
         }
     }
 }
 
-impl TodoComp {
-    pub fn list_data(&self) -> Html {
-        if self.open {
-            html!{
-                <TodoListComp id=TodoID::Parent(self.props.data.id)/>
-            }
-        }else {
-            html!{}
-        }
-    }
-}

@@ -44,7 +44,6 @@ impl Component for Wrapper {
     fn view(&self) -> Html {
         html! {
             <div>
-                {"wrapper"}
                 <ProjectListComponent/>
             </div>
         }

@@ -46,9 +46,9 @@ impl Component for ProjectComp {
 
         html! {
             <div>
-                <p onclick=open_click>
+                <h2 onclick=open_click>
                     {&self.props.data.title}
-                </p>
+                </h2>
                  {
                      if self.props.open {
                          html!{
