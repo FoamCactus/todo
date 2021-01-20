@@ -1,5 +1,5 @@
 use crate::error::ServiceError;
-use crate::models::todo::{Todo, TodoBuilder};
+use crate::models::todo::{Todo, TodoBuilder,TodoID};
 use crate::service::{Service, TodoService};
 use crate::todo::TodoComp;
 use wasm_bindgen::JsCast;
@@ -19,12 +19,6 @@ use yew_styles::layouts::container::Mode::SafeMode;
 use yew_styles::layouts::item::Item;
 use yew_styles::layouts::item::ItemLayout::{ItXs,ItS,ItM,ItL,ItXl};
 
-
-#[derive(Clone, Copy,Debug)]
-pub enum TodoID {
-    Parent(i32),
-    Project(i32),
-}
 
 pub struct TodoListComp {
     link: ComponentLink<Self>,
@@ -113,16 +107,8 @@ impl Component for TodoListComp {
                     if let Some(details) = &self.details {
                         builder.with_details(&details);
                     }
-                    match self.props.id {
-                        TodoID::Parent(id) => {
-                            self.task =
-                                Some(self.service.save(builder.parent(id).build(), callback))
-                        }
-                        TodoID::Project(id) => {
-                            self.task =
-                                Some(self.service.save(builder.project(id).build(), callback))
-                        }
-                    }
+                    builder.id(self.props.id);
+                    self.task = Some(self.service.save(builder,callback));
                 }
                 false
             }

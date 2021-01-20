@@ -4,6 +4,7 @@ use yew_styles::layouts::container::{Container,Wrap,Direction};
 use yew_styles::layouts::item::{Item,ItemLayout};
 use yew::Callback;
 use yew::MouseEvent;
+use chrono::{DateTime,Utc,NaiveDateTime};
 
 pub struct TodoComp {
     props: Props,
@@ -49,6 +50,15 @@ impl Component for TodoComp {
                             html!{}
                         }
                     }
+                    {
+                        if let Some(time) = &self.props.data.inserted_date {
+                            let date = DateTime::<Utc>::from_utc(NaiveDateTime::from_timestamp(i64::from(*time),0),Utc).to_rfc3339();
+                            html!{<>{" "}{date}</>}
+                        }else {
+                            html!{}
+                        }
+                    }
+
                 </Item>
             </Container>
         }

@@ -5,7 +5,7 @@ use requests::Requests;
 use yew::Callback;
 
 use crate::models::project::{NewProject, Project};
-use crate::models::todo::{NewTodo, Todo};
+use crate::models::todo::{TodoBuilder, Todo};
 use yew::services::fetch::FetchTask;
 
 pub trait Service {
@@ -52,7 +52,7 @@ pub struct TodoService {
 
 impl Service for TodoService {
     type Data = Todo;
-    type NewData = NewTodo;
+    type NewData = TodoBuilder;
 
     fn new() -> Self {
         Self {

@@ -15,6 +15,7 @@ table! {
         details -> Nullable<Text>,
         uuid -> Text,
         complete -> Bool,
+        inserted_date -> Nullable<Integer>,
     }
 }
 

@@ -1,5 +1,6 @@
 use crate::models::project::Project;
-use crate::todo_list::{TodoID, TodoListComp};
+use crate::models::todo::TodoID;
+use crate::todo_list::TodoListComp;
 use yew::MouseEvent;
 use yew::{html, Component, ComponentLink, Html, Properties, ShouldRender};
 

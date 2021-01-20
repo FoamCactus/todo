@@ -22,7 +22,8 @@ pub struct Todo {
     pub title: String,
     pub details: Option<String>,
     pub uuid: String,
-    pub complete: bool
+    pub complete: bool,
+    pub inserted_date: Option<i32>
 }
 #[derive(Serialize,Deserialize,Clone,Debug)]
 #[cfg_attr(feature = "backend", derive(Insertable))]
@@ -33,10 +34,21 @@ pub struct NewTodo {
     pub title: String,
     pub details: Option<String>,
     pub uuid: Option<String>,
-    pub complete: bool
+    pub complete: bool,
+    pub inserted_date: Option<i32>
 }
 
+
+#[derive(Serialize,Deserialize,Clone,Debug,Copy)]
+pub enum TodoID {
+    Parent(i32),
+    Project(i32),
+}
+
+#[derive(Serialize,Deserialize,Clone,Debug)]
 pub struct TodoBuilder{
+    id: Option<TodoID>,
+    inserted_date: Option<i32>,
     title: String,
     details: Option<String>,
     uuid: Option<String>,
@@ -48,6 +60,8 @@ impl TodoBuilder {
     pub fn new(title: &str) -> Self {
         info!("building new todo");
         Self {
+            id: None,
+            inserted_date: None,
             title: String::from(title),
             details: None,
             uuid: Some(Uuid::new_v4().to_string()),
@@ -60,73 +74,59 @@ impl TodoBuilder {
         self
     }
 
+    pub fn id(&mut self, id: TodoID) -> &mut Self {
+        self.id = Some(id);
+        self
+    }
+
     pub fn with_details(&mut self,details: &str) -> &mut Self {
         self.details = Some(String::from(details));
         self
     }
 
-    pub fn project(self, project_id: i32) -> TodoProjectBuilder{
-        TodoProjectBuilder {
-            project_id,
-            title: self.title,
-            details: self.details,
-            uuid: self.uuid,
-            complete: self.complete
-        }
+    pub fn with_insert_date(&mut self, date: i32 ) -> &mut Self {
+        self.inserted_date = Some(date);
+        self
     }
 
-    pub fn parent(self,parent_id: i32) -> TodoParentBuilder {
-        TodoParentBuilder {
-            parent_id,
-            title: self.title,
-            details: self.details,
-            uuid: self.uuid,
-            complete: self.complete
-        }
-
-    }
-}
-
-pub struct TodoProjectBuilder{
-    project_id: i32,
-    title: String,
-    details: Option<String>,
-    uuid: Option<String>,
-    complete: bool
-}
-
-impl TodoProjectBuilder{
-    pub fn build(self) -> NewTodo {
-        NewTodo{
-            project_id: Some(self.project_id),
-            parent_id: None,
-            title: self.title,
-            details: self.details,
-            uuid: self.uuid,
-            complete: self.complete
+    pub fn build(self) -> Result<NewTodo,MissingFieldError> {
+        if let Some(id_val) = self.id {
+            let new_todo = match id_val {
+                TodoID::Project(id) => {
+                    NewTodo{
+                        project_id: Some(id),
+                        parent_id: None,
+                        title: self.title,
+                        details: self.details,
+                        uuid: self.uuid,
+                        complete: self.complete,
+                        inserted_date: self.inserted_date
+                    }
+                },
+                TodoID::Parent(id) =>  {
+                    NewTodo{
+                        project_id: None,
+                        parent_id: Some(id),
+                        title: self.title,
+                        details: self.details,
+                        uuid: self.uuid,
+                        complete: self.complete,
+                        inserted_date: self.inserted_date
+                    }
+                }
+            };
+            Ok(new_todo)
+        }else {
+            Err(MissingFieldError::MissingID)
         }
     }
 }
 
-pub struct TodoParentBuilder{
-    parent_id: i32,
-    title: String,
-    details: Option<String>,
-    uuid: Option<String>,
-    complete: bool
+pub enum MissingFieldError {
+    MissingID,
+    MissingTitle
 }
-impl TodoParentBuilder{
-    pub fn build(self) -> NewTodo {
-        NewTodo{
-            project_id: None,
-            parent_id: Some(self.parent_id),
-            title: self.title,
-            details: self.details,
-            uuid: self.uuid,
-            complete: self.complete
-        }
-    }
-}
+
 
 #[cfg(feature= "backend")]
 pub fn get_all(con: &SqliteConnection) -> Result<Vec<Todo>, Error> {
