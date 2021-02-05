@@ -1,0 +1,47 @@
+This application is a simple todo app with arbitrary levels of todo item
+nesting. 
+
+Currently the frontend is in need of a graphic designer.
+
+Build steps.
+You will need to install diesel cli
+The basic command is "cargo install diesel-cli"
+Depending on the dev libraries you have installed you may need to disable
+features. Their website has good documentation on how to do that. 
+
+Once you have diesel-cli you want to run "diesel setup && diesel migration
+run" in the main directory. This should initialize the database and build the
+tables we need. 
+
+From there the build and run the backend the command should be "cargo run".
+
+
+To build the frontend you will need to install wasm-pack. The command is
+"cargo install wasm-pack".
+
+You will also need to install a singular node package of css files, "npm
+install" should work fine. The app does work without this it just looks worse.
+
+From there all you need to do is run the command "wasm-pack build --target web
+--out-name wasm --out-dir ./static" and it will build the web assembly to run
+the page.
+
+Both of these steps assume you are in the frontend directory.
+
+
+
+ Project Overview
+
+ Backend built around Diesel and serde. Actix-web is the server framework I
+ favor and makes working with REST requests really easy. Basically an async hander
+ gets data from the frontend as part of a request and directs that to some
+ syncronous function for interacting with the database and returns relevant
+ data about that transaction.
+
+ The frontend is also in Rust but leverages the yew framework which is extra
+ nice because I can use the same rust models in both the front and backend. In
+ fact I just use the same library with the models and some helper functions in
+ both places. If you havent heard of yew I highly recommend you check it out.
+
+
+
