@@ -6,3 +6,4 @@ database.sqlite3
 /frontend/target
 /frontend/static
 !/frontend/static/index.html
+auth-server/target
